@@ -82,6 +82,7 @@ module.exports = function(grunt) {
 
     shell: {
       prodServer: {
+        command: 'git push live master'
       }
     },
   });
@@ -96,11 +97,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-nodemon');
   grunt.loadNpmTasks('grunt-concurrent');
 
-  grunt.registerTask('server-dev', ['concurrent:target']);
+
 
   ////////////////////////////////////////////////////
   // Main grunt tasks
   ////////////////////////////////////////////////////
+
+  grunt.registerTask('server-dev', ['concurrent:target']);
 
   grunt.registerTask('test', [
     'mochaTest'
@@ -111,16 +114,15 @@ module.exports = function(grunt) {
 
   grunt.registerTask('upload', function(n) {
     if (grunt.option('prod')) {
-      // add your production server task here
+      grunt.task.run(['shell']);
     } else {
       grunt.task.run([ 'server-dev' ]);
     }
   });
 
   grunt.registerTask('deploy', [
-    'test'
-      // add your production server task here
+    'build',
+    'test',
+    'upload'
   ]);
-
-
 };
