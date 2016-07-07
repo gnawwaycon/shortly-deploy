@@ -105,12 +105,9 @@ module.exports = function(grunt) {
 
   grunt.registerTask('server-dev', ['concurrent:target']);
 
-  grunt.registerTask('test', [
-    'mochaTest'
-  ]);
+  grunt.registerTask('test', ['mochaTest']);
 
-  grunt.registerTask('build', ['eslint', 'concat:dist', 'uglify:dist', 'cssmin'
-  ]);
+  grunt.registerTask('build', ['eslint', 'concat:dist', 'uglify:dist', 'cssmin']);
 
   grunt.registerTask('upload', function(n) {
     if (grunt.option('prod')) {
@@ -120,9 +117,5 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('deploy', [
-    'build',
-    'test',
-    'upload'
-  ]);
+  grunt.registerTask('deploy', ['test', 'build', 'upload']);
 };
