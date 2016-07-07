@@ -1,5 +1,4 @@
 module.exports = function(grunt) {
-//testing
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
@@ -7,11 +6,18 @@ module.exports = function(grunt) {
         separator: ';\n',
       },
       dist: {
-        src: 'public/client/**/*.js',
+        src: ['public/lib/**/*.js', 'public/client/**/*.js'],
         dest: 'public/dist/bundle.js'
       }
     },
-
+    concurrent: {
+      target: {
+        tasks: ['watch', 'nodemon'],
+        options: {
+          logConcurrentOutput: true
+        }
+      }
+    },
     mochaTest: {
       test: {
         options: {
@@ -23,7 +29,10 @@ module.exports = function(grunt) {
 
     nodemon: {
       dev: {
-        script: 'server.js'
+        script: 'server.js',
+        options: {
+          ignore: ['public/**']
+        }
       }
     },
 
@@ -36,13 +45,22 @@ module.exports = function(grunt) {
     },
 
     eslint: {
+      options: {
+        quiet: true
+      },
       target: [
+        './**/*.js'
         // Add list of files to lint here
       ]
     },
 
     cssmin: {
+      target: {
+        files: {
+          'public/dist/styles.min.css': ['public/**/*.css']
+        }
         // Add list of files to lint here
+      }
     },
 
     watch: {
@@ -76,10 +94,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-nodemon');
+  grunt.loadNpmTasks('grunt-concurrent');
 
-  grunt.registerTask('server-dev', function (target) {
-    grunt.task.run([ 'nodemon', 'watch' ]);
-  });
+  grunt.registerTask('server-dev', ['concurrent:target']);
 
   ////////////////////////////////////////////////////
   // Main grunt tasks
@@ -89,7 +106,7 @@ module.exports = function(grunt) {
     'mochaTest'
   ]);
 
-  grunt.registerTask('build', [ 'concat:dist', 'uglify:dist'
+  grunt.registerTask('build', ['eslint', 'concat:dist', 'uglify:dist', 'cssmin'
   ]);
 
   grunt.registerTask('upload', function(n) {
@@ -101,6 +118,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('deploy', [
+    'test'
       // add your production server task here
   ]);
 
